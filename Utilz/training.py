@@ -685,7 +685,7 @@ def predict_timing(
     # print elapsed time in seconds
     print(f"Elapsed time: {end_time - start_time} seconds for {len(test_dataloader)} batches of size {batch_size}")
 
-def time_previous_code(test_dataset: CustomSequence, load_in_gpu: bool = True):
+def time_previous_code(test_dataset: CustomSequence, load_in_gpu: bool = True, model=None):
     class LSTMModel_previous(nn.Module): 
         # basic one with two linear layers and final output with sigmoid
         def __init__(self, input_size, hidden_size=1024, num_layers=1):
@@ -735,14 +735,17 @@ def time_previous_code(test_dataset: CustomSequence, load_in_gpu: bool = True):
                 nn.init.xavier_uniform_(self.fc3.weight)
                 self.fc3.bias.data.fill_(0)
 
-    
-    print("Timing for previous's model")
+    if model is None:
+        print("Timing for previous's model")
+        model = LSTMModel_previous(8264, 1024, 1)
+    else:
+        print("Timing for the current model")
 
-    previous_model = LSTMModel_previous(8264, 1024, 1)
+    # previous_model = LSTMModel_previous(8264, 1024, 1)
 
     if load_in_gpu:
         print("Timing for CUDA")
-        predict_timing(model=previous_model, test_dataset=test_dataset, device="cuda")
+        predict_timing(model=model, test_dataset=test_dataset, device="cuda")
     else:
         print("Timing for CPU")
-        predict_timing(model=previous_model, test_dataset=test_dataset, device="cpu")
+        predict_timing(model=model, test_dataset=test_dataset, device="cpu")
