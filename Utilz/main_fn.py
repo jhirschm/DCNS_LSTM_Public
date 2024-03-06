@@ -21,7 +21,10 @@ def main_function(
     custom_loss = get_custom_loss(args)
 
     if args.custom_code == 1:
-        time_previous_code(test_dataset, args.load_in_gpu)
+        time_previous_code(test_dataset, args.load_in_gpu, None)
+
+    elif args.custom_code == 2:
+        time_previous_code(val_dataset, args.load_in_gpu, model)
 
     elif args.do_analysis == 1:
         log_str = f"Analysis only mode for model {args.model}"
