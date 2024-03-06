@@ -656,9 +656,10 @@ def predict_timing(
     if load_model:
         model, _ = load_model_params(model, model_param_path, device)
 
+    print(f"Batch size: {batch_size} | {test_dataset._num_samples_per_file}")
     batch_size = batch_size or test_dataset._num_samples_per_file
-    while test_dataset._num_samples_per_file % batch_size != 0:
-        batch_size -= 1
+    # while test_dataset._num_samples_per_file % batch_size != 0:
+    #     batch_size -= 1
 
     test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
 
@@ -670,6 +671,8 @@ def predict_timing(
         model_save_name = f"{model_save_name}_"
 
     start_time = time.time()
+
+    print(f"for {len(test_dataloader)} batches of size {batch_size}")
 
     with torch.no_grad():
         for j, (X_batch, y_batch) in enumerate(test_dataloader):
