@@ -1,5 +1,4 @@
 *.pth
-*.npy
 *.pyc
 *.pkl
 *.pdf
