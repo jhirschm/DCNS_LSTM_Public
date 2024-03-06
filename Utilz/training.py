@@ -653,7 +653,6 @@ def predict_timing(
     load_model: bool = True,
     device: str = "cpu",
 ) -> np.ndarray:
-    
     if load_model:
         model, _ = load_model_params(model, model_param_path, device)
 
@@ -683,18 +682,31 @@ def predict_timing(
     end_time = time.time()
 
     # print elapsed time in seconds
-    print(f"Elapsed time: {end_time - start_time} seconds for {len(test_dataloader)} batches of size {batch_size}")
+    print(
+        f"Elapsed time: {end_time - start_time} seconds for {len(test_dataloader)} batches of size {batch_size}"
+    )
 
-def time_previous_code(test_dataset: CustomSequence, load_in_gpu: bool = True, model=None):
-    class LSTMModel_previous(nn.Module): 
+
+def time_previous_code(
+    test_dataset: CustomSequence,
+    load_in_gpu: bool = True,
+    model=None,
+    batch_size: int = 200,
+):
+    class LSTMModel_previous(nn.Module):
         # basic one with two linear layers and final output with sigmoid
         def __init__(self, input_size, hidden_size=1024, num_layers=1):
             super().__init__()
             self.input_size = input_size
             self.num_layers = num_layers
             self.hidden_size = hidden_size
-            self.lstm = nn.LSTM(input_size, hidden_size,
-                                batch_first=True, dropout=0, num_layers=num_layers)
+            self.lstm = nn.LSTM(
+                input_size,
+                hidden_size,
+                batch_first=True,
+                dropout=0,
+                num_layers=num_layers,
+            )
             self.fc1 = nn.Linear(hidden_size, 4000)
             self.fc2 = nn.Linear(4000, 4000)
             self.fc3 = nn.Linear(4000, input_size)
@@ -703,11 +715,13 @@ def time_previous_code(test_dataset: CustomSequence, load_in_gpu: bool = True, m
 
         def forward(self, x):
             # hidden state
-            h_0 = torch.zeros(self.num_layers * 1, x.size(0),
-                            self.hidden_size).to(x.device)  # Modified line
+            h_0 = torch.zeros(self.num_layers * 1, x.size(0), self.hidden_size).to(
+                x.device
+            )  # Modified line
             # cell state
-            c_0 = torch.zeros(self.num_layers * 1, x.size(0),
-                            self.hidden_size).to(x.device)  # Modified line
+            c_0 = torch.zeros(self.num_layers * 1, x.size(0), self.hidden_size).to(
+                x.device
+            )  # Modified line
 
             out, (hn, cn) = self.lstm(x, (h_0, c_0))
             out = self.fc1(out[:, -1, :])
@@ -716,17 +730,17 @@ def time_previous_code(test_dataset: CustomSequence, load_in_gpu: bool = True, m
             out = torch.sigmoid(out)
 
             return out
-        
+
         def initialize_weights(self):
             # Initialize LSTM weights and biases
             for name, param in self.lstm.named_parameters():
-                if 'weight_ih' in name:
+                if "weight_ih" in name:
                     nn.init.xavier_uniform_(param.data)
-                elif 'weight_hh' in name:
+                elif "weight_hh" in name:
                     nn.init.xavier_uniform_(param.data)
-                elif 'bias' in name:
+                elif "bias" in name:
                     param.data.fill_(0)
-            
+
                 # Initialize linear layers
                 nn.init.xavier_uniform_(self.fc1.weight)
                 self.fc1.bias.data.fill_(0)
@@ -745,7 +759,9 @@ def time_previous_code(test_dataset: CustomSequence, load_in_gpu: bool = True, m
 
     if load_in_gpu:
         print("Timing for CUDA")
-        predict_timing(model=model, test_dataset=test_dataset, device="cuda")
+        predict_timing(
+            model=model, test_dataset=test_dataset, device="cuda", batch_size=batch_size
+        )
     else:
         print("Timing for CPU")
-        predict_timing(model=model, test_dataset=test_dataset, device="cpu")
+        predict_timing(model=model, test_dataset=test_dataset, device="cpu", batch_size=batch_size)
