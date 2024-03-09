@@ -642,7 +642,7 @@ def train_and_test(
 def predict_timing(
     model: nn.Module,
     model_param_path: str = None,
-    test_dataset: CustomSequence = None,
+    dataset: CustomSequence = None,
     output_dir: str = ".",
     output_name: str = "all_preds.h5",
     verbose: bool = True,
@@ -656,11 +656,12 @@ def predict_timing(
     if load_model:
         model, _ = load_model_params(model, model_param_path, device)
 
-    batch_size = batch_size or test_dataset._num_samples_per_file
-    while test_dataset._num_samples_per_file % batch_size != 0:
-        batch_size -= 1
+    print(f"Batch size: {batch_size} | #Samples/file in dataset: {dataset._num_samples_per_file}")
+    batch_size = batch_size or dataset._num_samples_per_file
+    # while test_dataset._num_samples_per_file % batch_size != 0:
+    #     batch_size -= 1
 
-    test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+    dataloader = DataLoader(dataset, batch_size=batch_size)
 
     model.to(device)
     model.eval()
@@ -671,8 +672,10 @@ def predict_timing(
 
     start_time = time.time()
 
+    print(f"for {len(dataloader)} batches of size {batch_size}")
+
     with torch.no_grad():
-        for j, (X_batch, y_batch) in enumerate(test_dataloader):
+        for j, (X_batch, y_batch) in enumerate(dataloader):
             X_batch = X_batch.to(device)
 
             pred = one_predict_pass(
@@ -683,12 +686,12 @@ def predict_timing(
 
     # print elapsed time in seconds
     print(
-        f"Elapsed time: {end_time - start_time} seconds for {len(test_dataloader)} batches of size {batch_size}"
+        f"Elapsed time: {end_time - start_time} seconds for {len(dataloader)} batches of size {batch_size}"
     )
 
 
 def time_previous_code(
-    test_dataset: CustomSequence,
+    dataset: CustomSequence,
     load_in_gpu: bool = True,
     model=None,
     batch_size: int = 200,
@@ -707,9 +710,10 @@ def time_previous_code(
                 dropout=0,
                 num_layers=num_layers,
             )
-            self.fc1 = nn.Linear(hidden_size, 4000)
-            self.fc2 = nn.Linear(4000, 4000)
-            self.fc3 = nn.Linear(4000, input_size)
+            self.linear_size = 4000
+            self.fc1 = nn.Linear(hidden_size, self.linear_size)
+            self.fc2 = nn.Linear(self.linear_size, self.linear_size)
+            self.fc3 = nn.Linear(self.linear_size, input_size)
             self.relu = nn.ReLU()
             self.initialize_weights()
 
@@ -753,15 +757,22 @@ def time_previous_code(
         print("Timing for previous's model")
         model = LSTMModel_previous(8264, 1024, 1)
     else:
+        model.hidden_size = model.lstm.hidden_size
+        model.linear_size = model.linear[0].out_features
         print("Timing for the current model")
 
     # previous_model = LSTMModel_previous(8264, 1024, 1)
 
+    # print the details of the model
+    print(f"Timing model with: LSTM hidden size: {model.hidden_size}, Linear size: {model.linear_size}, n_layers: {model.num_layers}")
+
     if load_in_gpu:
         print("Timing for CUDA")
         predict_timing(
-            model=model, test_dataset=test_dataset, device="cuda", batch_size=batch_size
+            model=model, dataset=dataset, device="cuda", batch_size=batch_size
         )
     else:
         print("Timing for CPU")
-        predict_timing(model=model, test_dataset=test_dataset, device="cpu", batch_size=batch_size)
+        predict_timing(
+            model=model, dataset=dataset, device="cpu", batch_size=batch_size
+        )
