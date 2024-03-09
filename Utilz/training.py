@@ -757,6 +757,7 @@ def time_previous_code(
         print("Timing for previous's model")
         model = LSTMModel_previous(8264, 1024, 1)
     else:
+        model.hidden_size = model.lstm.hidden_size
         model.linear_size = model.linear[0].out_features
         print("Timing for the current model")
 
