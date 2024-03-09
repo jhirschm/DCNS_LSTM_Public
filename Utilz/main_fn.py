@@ -1,4 +1,4 @@
-from Utilz.training import predict, train_and_test, tune_and_train, time_previous_code
+from Utilz.training import predict, train_and_test, tune_and_train, time_previous_code, load_model_params
 from Utilz.loads import get_custom_loss
 from Utilz.data import CustomSequence
 import logging
@@ -24,6 +24,8 @@ def main_function(
         time_previous_code(test_dataset, args.load_in_gpu, None, args.batch_size)
 
     elif args.custom_code == 2:
+        device = "cuda" if args.load_in_gpu else "cpu"
+        model = load_model_params(model, args.model_param_path, device)
         time_previous_code(test_dataset, args.load_in_gpu, model, args.batch_size)
 
     elif args.do_analysis == 1:
