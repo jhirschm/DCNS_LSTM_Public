@@ -25,7 +25,7 @@ def main_function(
 
     elif args.custom_code == 2:
         device = "cuda" if args.load_in_gpu else "cpu"
-        model = load_model_params(model, args.model_param_path, device)
+        model, _ = load_model_params(model, args.model_param_path, device)
         time_previous_code(test_dataset, args.load_in_gpu, model, args.batch_size)
 
     elif args.do_analysis == 1:
