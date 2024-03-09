@@ -716,6 +716,11 @@ def time_previous_code(
             self.relu = nn.ReLU()
             self.initialize_weights()
 
+            print(
+                f"hidden_size: {hidden_size}, linear size: {4000}, n_layers: {num_layers}"
+            )
+
+
         def forward(self, x):
             # hidden state
             h_0 = torch.zeros(self.num_layers * 1, x.size(0), self.hidden_size).to(
