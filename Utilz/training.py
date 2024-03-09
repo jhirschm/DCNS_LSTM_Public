@@ -720,7 +720,6 @@ def time_previous_code(
                 f"hidden_size: {hidden_size}, linear size: {4000}, n_layers: {num_layers}"
             )
 
-
         def forward(self, x):
             # hidden state
             h_0 = torch.zeros(self.num_layers * 1, x.size(0), self.hidden_size).to(
@@ -761,9 +760,13 @@ def time_previous_code(
         print("Timing for previous's model")
         model = LSTMModel_previous(8264, 1024, 1)
     else:
+        model.linear_size = model.linear[0].out_features
         print("Timing for the current model")
 
     # previous_model = LSTMModel_previous(8264, 1024, 1)
+
+    # print the details of the model
+    print(f"LSTM hidden size: {model.hidden_size}, Linear size: {model.linear_size}, n_layers: {model.num_layers}")
 
     if load_in_gpu:
         print("Timing for CUDA")
@@ -772,4 +775,6 @@ def time_previous_code(
         )
     else:
         print("Timing for CPU")
-        predict_timing(model=model, test_dataset=test_dataset, device="cpu", batch_size=batch_size)
+        predict_timing(
+            model=model, test_dataset=test_dataset, device="cpu", batch_size=batch_size
+        )
