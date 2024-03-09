@@ -24,7 +24,7 @@ def main_function(
         time_previous_code(test_dataset, args.load_in_gpu, None, args.batch_size)
 
     elif args.custom_code == 2:
-        time_previous_code(val_dataset, args.load_in_gpu, model, args.batch_size)
+        time_previous_code(test_dataset, args.load_in_gpu, model, args.batch_size)
 
     elif args.do_analysis == 1:
         log_str = f"Analysis only mode for model {args.model}"
