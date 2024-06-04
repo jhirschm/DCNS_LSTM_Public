@@ -11,7 +11,7 @@ from Utilz.losses import (
     wMSE_and_energy,
     normalized_weighted_MSE,
 )
-from Utilz.data import CustomSequence
+from Utilz.data import CustomSequence, CustomSequenceTiming
 
 
 def get_custom_loss(args: Namespace) -> Callable:
@@ -67,12 +67,22 @@ def get_datasets(
         load_in_gpu=load_in_gpu,
     )
 
-    test_dataset = CustomSequence(
+    # If timing, do the timing dataset
+    if args.custom_code == 1 or args.custom_code == 2:
+        test_dataset = CustomSequenceTiming(
         args.data_dir,
         range(90, 100),
         load_mode=args.test_load_mode,
         crystal_length=args.crystal_length,
         load_in_gpu=load_in_gpu,
     )
+    else:
+        test_dataset = CustomSequence(
+            args.data_dir,
+            range(90, 100),
+            load_mode=args.test_load_mode,
+            crystal_length=args.crystal_length,
+            load_in_gpu=load_in_gpu,
+        )
 
     return train_dataset, val_dataset, test_dataset
