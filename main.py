@@ -225,6 +225,13 @@ def get_cmd_args():
         help="If we want to load the data in the GPU or not.",
     )
 
+    parser.add_argument(
+        "--cpu_cores",
+        type=int,
+        default=None,
+        help="Number of CPU cores we want to use.",
+    )
+
 
     return parser.parse_args()
 
@@ -233,6 +240,8 @@ def get_cmd_args():
 if __name__ == "__main__":
     # Get the args from command line
     args = get_cmd_args()
+
+
 
     if "LSTM" in args.model:
         main_lstm(args)
