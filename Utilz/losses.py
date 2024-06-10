@@ -2,6 +2,7 @@ from torchmetrics.regression import PearsonCorrCoef
 import torch
 import torch.nn as nn
 import numpy as np
+import os
 
 freq_vectors_shg = np.load("Data/shg_freq_domain_ds.npy")
 freq_vectors_sfg = np.load("Data/sfg_freq_domain_ds.npy")
@@ -11,6 +12,7 @@ domain_spacing_shg = (
     freq_vectors_shg[1] - freq_vectors_shg[0]
 ) * 1e-12  # scaled to be back in Hz
 domain_spacing_sfg = (freq_vectors_sfg[1] - freq_vectors_sfg[0]) * 1e-12
+
 
 def get_intensity(field: torch.Tensor) -> float:
     """
@@ -23,6 +25,7 @@ def calc_energy_expanded(
     field: torch.Tensor, domain_spacing: torch.Tensor, spot_area: float
 ) -> float:
     return torch.sum(get_intensity(field)) * domain_spacing * spot_area
+
 
 def area_under_curve_diff(
     real_pred: torch.Tensor,
@@ -142,7 +145,6 @@ def normalized_weighted_MSE(
     reduction: str = "mean",
     **kwargs,
 ) -> torch.Tensor:
-    
     # if the y_pred has a second dimension of 1, squeeze it
     if y_pred.shape[1] == 1:
         y_pred = y_pred.squeeze(1)
@@ -174,7 +176,6 @@ def normalized_weighted_MSE(
     sfg_pred = torch.cat((sfg_real_pred, sfg_complex_pred), dim=1)
     sfg_real = torch.cat((sfg_real_real, sfg_complex_real), dim=1)
 
-
     shg1_numerator = torch.sum(torch.square(shg1_pred - shg1_real), dim=1)
     shg1_denominator = torch.sum(torch.square(shg1_real), dim=1)
 
@@ -188,12 +189,15 @@ def normalized_weighted_MSE(
     shg2_loss_mean = torch.mean(torch.sqrt(shg2_numerator / shg2_denominator))
     sfg_loss_mean = torch.mean(torch.sqrt(sfg_numerator / sfg_denominator))
 
-    loss_val = shg_weight * (shg1_loss_mean + shg2_loss_mean) + sfg_weight * sfg_loss_mean
+    loss_val = (
+        shg_weight * (shg1_loss_mean + shg2_loss_mean) + sfg_weight * sfg_loss_mean
+    )
 
     if loss_val > 1:
         print("Loss value is greater than 1:", loss_val)
-    
+
     return loss_val
+
 
 # This is a custom loss function that gives different weights
 # to the different parts of the signal
@@ -205,7 +209,6 @@ def weighted_MSE(
     reduction: str = "mean",
     **kwargs,
 ) -> torch.Tensor:
-    
     # if the y_pred has a second dimension of 1, squeeze it
     if y_pred.shape[1] == 1:
         y_pred = y_pred.squeeze(1)
@@ -245,11 +248,13 @@ def weighted_MSE(
     )
     sfg_loss_mean = torch.mean(sfg_loss, dim=-1)
 
-    loss_val = shg_weight * (shg1_loss_mean + shg2_loss_mean) + sfg_weight * sfg_loss_mean
+    loss_val = (
+        shg_weight * (shg1_loss_mean + shg2_loss_mean) + sfg_weight * sfg_loss_mean
+    )
 
     if loss_val > 1:
         print("Loss value is greater than 1:", loss_val)
-    
+
     return loss_val
 
 
@@ -378,3 +383,203 @@ def wMSE_and_energy(
     ) + pseudo_energy_loss(
         y_pred, y_real, shg_weight=shg_weight, sfg_weight=sfg_weight, **kwargs
     )
+
+
+def calculate_and_visualize_mixed_MSE_metric(
+    output_dir: str, data_dir: str, model_save_name: str
+):
+    npz_file_path = (
+        f"{output_dir}/{model_save_name}_time_and_freq_domain_MSE_errors.npz"
+    )
+
+    # First, attempt to load the pre-calculated MSE values
+    if os.path.exists(npz_file_path):
+        data = np.load(npz_file_path)
+        SFG_MSE_errors = data["SFG_MSE_errors"]
+        SHG1_MSE_errors = data["SHG1_MSE_errors"]
+        SHG2_MSE_errors = data["SHG2_MSE_errors"]
+    else:
+        # Data loading or MSE metrics calculation code will go here
+        SFG_MSE_errors_time, SHG1_MSE_errors_time, SHG2_MSE_errors_time = (
+            calculate_mixed_MSE_metric(
+                data_dir, model_save_name, output_dir, return_vals=1, normalize=True
+            )
+        )
+
+        SFG_MSE_errors_freq, SHG1_MSE_errors_freq, SHG2_MSE_errors_freq = (
+            calculate_mixed_MSE_metric(
+                data_dir, model_save_name, output_dir, return_vals=2, normalize=True
+            )
+        )
+
+        SFG_MSE_errors = 0.5 * SFG_MSE_errors_time + 0.5 * SFG_MSE_errors_freq
+        SHG1_MSE_errors = 0.5 * SHG1_MSE_errors_time + 0.5 * SHG1_MSE_errors_freq
+        SHG2_MSE_errors = 0.5 * SHG2_MSE_errors_time + 0.5 * SHG2_MSE_errors_freq
+
+        # Convert the list of errors to a numpy array
+        SFG_MSE_errors = np.array(SFG_MSE_errors)
+        SHG1_MSE_errors = np.array(SHG1_MSE_errors)
+        SHG2_MSE_errors = np.array(SHG2_MSE_errors)
+
+        # Save the errors to a file inside the output directory with the model name
+        np.savez_compressed(
+            npz_file_path,
+            SFG_MSE_errors=SFG_MSE_errors,
+            SHG1_MSE_errors=SHG1_MSE_errors,
+            SHG2_MSE_errors=SHG2_MSE_errors,
+        )
+
+    # Proceed to visualize the results
+    visualize_MSE_errors(
+        SFG_MSE_errors, SHG1_MSE_errors, SHG2_MSE_errors, model_save_name
+    )
+
+
+def calculate_mixed_MSE_metric(
+    data_dir, model_save_name, output_dir, return_vals=1, normalize=False
+):
+    from Analysis.analyze_reim import do_analysis
+
+    # Assumed imports and preceding for-loop for the original code's MSE metric load or calculations
+    mse = nn.MSELoss(reduction="mean")
+    SFG_MSE_errors, SHG1_MSE_errors, SHG2_MSE_errors = [], [], []
+
+    for file_idx in range(91, 100):
+        for example_idx in range(0, 100):
+            print(f"File: {file_idx}, Example: {example_idx}")
+            (
+                sfg_time_true,
+                sfg_time_pred,
+                shg1_time_true,
+                shg1_time_pred,
+                shg2_time_true,
+                shg2_time_pred,
+            ) = do_analysis(
+                output_dir,
+                data_dir,
+                model_save_name,
+                file_idx,
+                example_idx,
+                return_vals=return_vals,
+            )
+
+            sfg_time_true = torch.tensor(sfg_time_true)
+            sfg_time_pred = torch.tensor(sfg_time_pred)
+            shg1_time_true = torch.tensor(shg1_time_true)
+            shg1_time_pred = torch.tensor(shg1_time_pred)
+            shg2_time_true = torch.tensor(shg2_time_true)
+            shg2_time_pred = torch.tensor(shg2_time_pred)
+
+            sfg_time_true_intensity = get_intensity(sfg_time_true)
+            sfg_time_pred_intensity = get_intensity(sfg_time_pred)
+            shg1_time_true_intensity = get_intensity(shg1_time_true)
+            shg1_time_pred_intensity = get_intensity(shg1_time_pred)
+            shg2_time_true_intensity = get_intensity(shg2_time_true)
+            shg2_time_pred_intensity = get_intensity(shg2_time_pred)
+
+            sfg_mse = mse(sfg_time_true_intensity, sfg_time_pred_intensity)
+            shg1_mse = mse(shg1_time_true_intensity, shg1_time_pred_intensity)
+            shg2_mse = mse(shg2_time_true_intensity, shg2_time_pred_intensity)
+
+            if normalize:
+                sfg_mse /= (
+                    mse(
+                        sfg_time_true_intensity,
+                        torch.zeros_like(sfg_time_true_intensity),
+                    )
+                    # * sfg_time_true_intensity.shape[0]
+                )
+                shg1_mse /= (
+                    mse(
+                        shg1_time_true_intensity,
+                        torch.zeros_like(shg1_time_true_intensity),
+                    )
+                    # * shg1_time_true_intensity.shape[0]
+                )
+                shg2_mse /= (
+                    mse(
+                        shg2_time_true_intensity,
+                        torch.zeros_like(shg2_time_true_intensity),
+                    )
+                    # * shg2_time_true_intensity.shape[0]
+                )
+
+            SFG_MSE_errors.append(sfg_mse)
+            SHG1_MSE_errors.append(shg1_mse)
+            SHG2_MSE_errors.append(shg2_mse)
+
+    # convert the list of errors to a numpy array
+    SFG_MSE_errors = np.array(SFG_MSE_errors)
+    SHG1_MSE_errors = np.array(SHG1_MSE_errors)
+    SHG2_MSE_errors = np.array(SHG2_MSE_errors)
+
+    return SFG_MSE_errors, SHG1_MSE_errors, SHG2_MSE_errors
+
+
+def visualize_MSE_errors(
+    SFG_MSE_errors, SHG1_MSE_errors, SHG2_MSE_errors, model_save_name
+):
+    import matplotlib
+    import matplotlib.pyplot as plt
+
+    matplotlib.rcParams["pdf.fonttype"] = 42
+
+    fig, axs = plt.subplots(3, 1, figsize=(10, 15))
+    datasets = [
+        (SFG_MSE_errors, f"SFG Intensity MSE Errors for {model_save_name}"),
+        (SHG1_MSE_errors, f"SHG1 Intensity MSE Errors for {model_save_name}"),
+        (SHG2_MSE_errors, f"SHG2 Intensity MSE Errors for {model_save_name}"),
+    ]
+
+    for ax, (data, title) in zip(axs, datasets):
+        # Ensure data is positive and above a very small threshold to avoid log(0)
+        data = np.array(data)
+        data = data[data > 0]
+
+        # Define custom bin edges
+        if "SFG" in title:
+            print(f"max data: {max(data)}")
+            bin_edges = np.linspace(min(data), 1, 49)  # 49 bins up to 1
+            bin_edges = np.append(bin_edges, np.linspace(1, int(max(data)) + 0.5, 6))
+            ax.hist(data, bins=bin_edges, edgecolor="black")
+        else:
+            print(f"max data: {max(data)}")
+            bin_edges = np.linspace(min(data), 0.2, 49)  # 49 bins up to 1
+            bin_edges = np.append(bin_edges, np.linspace(0.2, round(max(data), 1), 5))
+            ax.hist(data, bins=bin_edges, edgecolor="black")
+
+        ax.set_title(title)
+
+        mean = np.mean(data)
+        median = np.median(data)
+        std = np.std(data)
+
+        # Draw vertical lines for mean and median
+        ax.axvline(
+            mean, color="r", linestyle="dashed", linewidth=1, label=f"Mean: {mean:.3e}"
+        )
+        ax.axvline(
+            median,
+            color="g",
+            linestyle="dashed",
+            linewidth=1,
+            label=f"Median: {median:.3e}",
+        )
+
+        ax.legend(loc="lower right")
+
+        # Text formatting in scientific notation
+        text_str = f"Mean: {mean:.3e}\nMedian: {median:.3e}\nStd: {std:.3e}"
+        ax.text(
+            0.95,
+            0.95,
+            text_str,
+            transform=ax.transAxes,
+            fontsize=12,
+            verticalalignment="top",
+            horizontalalignment="right",
+            bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.5),
+        )
+
+    plt.tight_layout()
+    plt.savefig(f"{model_save_name}_time_and_freq_domain_MSE_errors.pdf")
