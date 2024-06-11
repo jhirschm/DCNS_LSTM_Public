@@ -764,7 +764,7 @@ def time_previous_code(
     # previous_model = LSTMModel_previous(8264, 1024, 1)
 
     # print the details of the model
-    print(f"Timing model with: LSTM hidden size: {model.hidden_size}, Linear size: {model.linear_size}, n_layers: {model.num_layers}")
+    print(f"Timing model prediction with: LSTM hidden size: {model.hidden_size}, Linear size: {model.linear_size}, n_layers: {model.num_layers}")
 
     if load_in_gpu:
         print("Timing for CUDA")

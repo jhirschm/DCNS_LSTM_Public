@@ -1,7 +1,9 @@
 from Utilz.training import predict, train_and_test, tune_and_train, time_previous_code, load_model_params
 from Utilz.loads import get_custom_loss
 from Utilz.data import CustomSequence
+from Utilz.losses import calculate_and_visualize_mixed_MSE_metric
 import logging
+import torch
 import torch.nn as nn
 import os
 
@@ -20,6 +22,11 @@ def main_function(
 ):
     custom_loss = get_custom_loss(args)
 
+    if args.cpu_cores is not None:
+        print(f"Setting number of CPU cores to {args.cpu_cores}")
+        torch.set_num_threads(args.cpu_cores)
+        torch.set_num_interop_threads(args.cpu_cores)
+
     if args.custom_code == 1:
         time_previous_code(test_dataset, args.load_in_gpu, None, args.batch_size)
 
@@ -27,6 +34,9 @@ def main_function(
         device = "cuda" if args.load_in_gpu else "cpu"
         model, _ = load_model_params(model, args.model_param_path, device)
         time_previous_code(test_dataset, args.load_in_gpu, model, args.batch_size)
+    
+    elif args.custom_code == 3:
+        calculate_and_visualize_mixed_MSE_metric(args.output_dir, args.data_dir, args.model_save_name)
 
     elif args.do_analysis == 1:
         log_str = f"Analysis only mode for model {args.model}"
