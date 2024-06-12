@@ -46,9 +46,9 @@
   },
   "@type": "sc:Dataset",
   "name": "DCNS_set",
-  "description": "blah blah blah",
+  "description": "This data is created using the Start-to-End Software model for chirped pulse amplifier and nonlinear optics systems from Hirschman, et al [https://doi.org/10.1364/OE.520542]. The simulation involved an oscillator, pulse shaper, amplifier, and noncolinear sum-frequency generation (SFG) upconversion process. Each example in the dataset uses a different set of pulse shaper parameters (effectively modulating the input to the amplifier and then to the SFG. The pulse shaper parameter space included scanning second- and third-order dispersion (SOD and TOD) values from -1e4 to 1e4 (fs)^2 and -1e5 to 1e5 (fs)^3, respectively. For spectral amplitude shaping, hole positions from 1022 nm to 1036 nm in steps of 0.35 nm, hole depths from 0 to 0.95 in steps of 0.0475, and hole widths from 0.1 nm to 4 nm in steps of 0.195 nm were all scanned. Out of all these combinations 10,000 parameter combinations were selected (enforcing at least 400 had no hole ie hole depth was zero). The simulation for each parameter combination was run and the three output fields in frequency domain from the final SFG process were stored as complex values in a concatenated vector. For data storage purposes, these vectors were all downsampled and cut compared to the original simulation output. The accompanying paper submission describes this data reduction process. All of the data was then placed in an H5 file. Additionally, when using this data for training machine learning models, we use a min-max scaler across all examples for each element in the vector. We store this scaler here and also include the weights from the LSTM associated with our paper.",
   "conformsTo": "http://mlcommons.org/croissant/1.0",
-  "citeAs": "more blah blah",
+  "citeAs": "Hirschman, J., Wang, M., Abedi, E., and Carbajo, S. (2024). H5 Start-to-end Laser Modeling Data--oscillator, pulse shaper, amplifier, dcns--and LSTM Model Weights. Stanford Digital Repository. Available at https://purl.stanford.edu/nf288ry2198. https://doi.org/10.25740/nf288ry2198.",
   "url": "https://purl.stanford.edu/nf288ry2198",
   "distribution": [
     {
