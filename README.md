@@ -7,6 +7,13 @@ This document provides a comprehensive guide to using the LSTM model training an
 ## Overview
 The script allows training, testing, and analysis of LSTM-based neural networks for solving a complex NLO process. It supports multiple functionalities, including hyperparameter tuning, model prediction, data analysis, and custom loss functions.
 
+## Croissant
+We include a trial croissant json file for metadata description; however, ML Croissant does not currently have complete support of H5 file formats. We have notified the developers (https://github.com/mlcommons/croissant/issues/697) and are awaiting a response. 
+
+### Dataset structure
+Our data can be found at https://purl.stanford.edu/nf288ry2198. 
+The H5 files contain network inputs (X) and network outputs (y). Within both, there are 100 datasets (indexed as "dataset_0" to "dataset_99"). For the X inputs, each dataset has shape (10000, 10, 8264) for 100 unique examples with 100 slices in the crystal (100x100=10000) and with 10 inputs to the LSTM. Each vector is then 8264 words. y is structured with shape (10000, 8264) for each dataset since 10 inputs for the LSTM yields 1 output in y. 
+
 ## Requirements
 Ensure that your Python environment is correctly set up with necessary dependencies which are listed in the `requirements.txt` file. You can install them using the following command:
 
@@ -83,7 +90,7 @@ python3 main.py --model LSTM --data_dir /path/to/data --custom_code 2
 
 For generating the histogram of the final evaluation metric:
 ```bash
-python3 main.py --model LSTM --data_dir /path/to/data --output_dir "/mnt/twoterra/outputs/14-02-2024/" --model_save_name EXAMPLE_MODEL --custom_code 3
+python3 main.py --model LSTM --data_dir /path/to/data --output_dir /path/to/output --model_save_name EXAMPLE_MODEL --custom_code 3
 ```
 
 
