@@ -1,0 +1,131 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "sc": "https://schema.org/",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "name": "DCNS_set",
+  "description": "blah blah blah",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "citeAs": "more blah blah",
+  "url": "https://purl.stanford.edu/nf288ry2198",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "X_new_data.h5",
+      "name": "X_new_data",
+      "contentUrl": "https://stacks.stanford.edu/file/druid:nf288ry2198/X_new_data.h5",
+      "encodingFormat": "application/x-hdf5",
+      "sha256": "031296bbc80c45a1d1f76bf9a90ead27e94e99ec629208449507a4917a3bf009"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "y_new_data.h5",
+      "name": "y_new_data",
+      "contentUrl": "https://stacks.stanford.edu/file/druid:nf288ry2198/y_new_data.h5",
+      "encodingFormat": "application/y-hdf5",
+      "sha256": "031296bbc80c45a1d1f76bf9a90ead27e94e99ec629208449507a4917a3bf009"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "stanford-repository",
+      "name": "stanford-repository",
+      "description": "The folder for this dataset on the Stanford Digital Repository.",
+      "contentUrl": "https://purl.stanford.edu/nf288ry2198",
+      "encodingFormat": "https",
+      "sha256": "main"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "pkl-files",
+      "name": "pkl-files",
+      "description": "pkl files are hosted on the Stanford Digital repository.",
+      "containedIn": {
+        "@id": "stanford-repository"
+      },
+      "encodingFormat": "application/octet-stream",
+      "includes": "*.pkl"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "X_dataset",
+      "name": "X",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "X_new_data.h5/dataset_0",
+          "name": "Input signals",
+          "description": "Going through a crystal 10 times with the 10 specified initials signal that are stored 10 times in the every 100th index of dataset_0.",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": {
+              "@id": "X_new_data.h5"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "Y_dataset",
+      "name": "Y",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "dataset_0",
+          "name": "Output signals",
+          "description": "The output signal (dataset_0 in Y) corresponding to the respective input signal (dataset_0 in X)",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": {
+              "@id": "y_new_data.h5"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
