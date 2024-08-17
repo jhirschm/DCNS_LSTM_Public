@@ -525,7 +525,7 @@ def do_analysis(
         file_save_name=file_save_name,
         normalize=False,
     )
-
+    save_vectors = True
     if save_vectors:
         # Convert lists to NumPy arrays
         freq_vectors_sfg_list = [np.array(freq_vectors_sfg), np.array(freq_vectors_sfg)]
