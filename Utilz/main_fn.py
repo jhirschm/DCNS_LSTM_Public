@@ -49,6 +49,7 @@ def main_function(
             model_save_name,
             file_idx=args.analysis_file,
             item_idx=args.analysis_example,
+            fig_save_dir=args.fig_save_dir,
         )
 
     elif args.do_prediction == 1:

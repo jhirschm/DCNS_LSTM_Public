@@ -525,3 +525,39 @@ def do_analysis(
         file_save_name=file_save_name,
         normalize=False,
     )
+
+    if save_vectors:
+        # Convert lists to NumPy arrays
+        freq_vectors_sfg_list = [np.array(freq_vectors_sfg), np.array(freq_vectors_sfg)]
+        freq_vectors_shg1_list = [np.array(freq_vectors_shg1), np.array(freq_vectors_shg1)]
+        freq_vectors_shg2_list = [np.array(freq_vectors_shg2), np.array(freq_vectors_shg2)]
+        
+        fields_sfg_list = [np.array(y_true_trans_sfg), np.array(y_pred_trans_sfg)]
+        fields_shg1_list = [np.array(y_true_trans_shg1), np.array(y_pred_trans_shg1)]
+        fields_shg2_list = [np.array(y_true_trans_shg2), np.array(y_pred_trans_shg2)]
+        
+        sfg_time_vector_list = [np.array(sfg_original_time), np.array(sfg_original_time)]
+        shg1_time_vector_list = [np.array(sfg_original_time), np.array(sfg_original_time)]
+        shg2_time_vector_list = [np.array(sfg_original_time), np.array(sfg_original_time)]
+        
+        sfg_freq_to_time_list = [np.array(sfg_freq_to_time_true), np.array(sfg_freq_to_time_pred)]
+        shg1_freq_to_time_list = [np.array(shg1_freq_to_time_true), np.array(shg1_freq_to_time_pred)]
+        shg2_freq_to_time_list = [np.array(shg2_freq_to_time_true), np.array(shg2_freq_to_time_pred)]
+        
+        # Save all arrays to a single .npz file
+        file_name = "data_dump.npz"
+        output_path = os.path.join(fig_save_dir, file_name)
+        np.savez(output_path,
+                 freq_vectors_sfg_list=freq_vectors_sfg_list,
+                 freq_vectors_shg1_list=freq_vectors_shg1_list,
+                 freq_vectors_shg2_list=freq_vectors_shg2_list,
+                 fields_sfg_list=fields_sfg_list,
+                 fields_shg1_list=fields_shg1_list,
+                 fields_shg2_list=fields_shg2_list,
+                 sfg_time_vector_list=sfg_time_vector_list,
+                 shg1_time_vector_list=shg1_time_vector_list,
+                 shg2_time_vector_list=shg2_time_vector_list,
+                 sfg_freq_to_time_list=sfg_freq_to_time_list,
+                 shg1_freq_to_time_list=shg1_freq_to_time_list,
+                 shg2_freq_to_time_list=shg2_freq_to_time_list)
+        

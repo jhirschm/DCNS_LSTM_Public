@@ -68,6 +68,13 @@ def get_cmd_args():
     )
 
     parser.add_argument(
+        "--fig_save_dir",
+        type=str,
+        default=None,
+        help="Directory for figures from analysis",
+    )
+
+    parser.add_argument(
         "--model_param_path",
         type=str,
         default=None,
