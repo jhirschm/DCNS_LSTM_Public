@@ -34,7 +34,7 @@ for row_idx, (data, labels) in enumerate(all_data_labels):
     axes[row_idx, 10].axis('off')
 
 plt.tight_layout()
-plt.savefig(plot_save)
+# plt.savefig(plot_save)
 plt.show()
 
 
