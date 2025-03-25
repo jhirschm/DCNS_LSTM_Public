@@ -7,7 +7,7 @@ data_dir = "/fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_
 plot_path = "/sdf/home/j/jhirschm/Publications/DCNS_LSTM"
 plot_name = "data_proc_fig1.pdf"
 plot_save = os.path.join(plot_path, plot_name)
-def get_data_labels(sample_idx,file_idx):
+def get_data_labels(file_idx, sample_idx):
     with h5py.File(os.path.join(data_dir, "X_new_data.h5"), "r") as file:
         data = np.array(file[f"dataset_{file_idx}"][sample_idx])
 
@@ -34,7 +34,7 @@ for row_idx, (data, labels) in enumerate(all_data_labels):
 
 plt.tight_layout()
 # print(os.makedirs(plot_path, exist_ok=True))
-plt.savefig("fig2.pdf", bbox_inches='tight')
+plt.savefig("fig.pdf", bbox_inches='tight')
 plt.show()
 
 
