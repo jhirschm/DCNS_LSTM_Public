@@ -19,7 +19,7 @@ def get_data_labels(file_idx, sample_idx):
         
         labels = y_dataset[sample_idx]
 
-data0, labels0 = get_data_labels(0,0)
+data0, labels0 = get_data_labels(1,0)
 data1, labels1 = get_data_labels(0,1)
 data2, labels2 = get_data_labels(0,2)
 data99, labels99 = get_data_labels(0,99)
