@@ -34,8 +34,8 @@ for row_idx, (data, labels) in enumerate(all_data_labels):
     axes[row_idx, 10].axis('off')
 
 plt.tight_layout()
-print(os.makedirs(plot_path, exist_ok=True))
-plt.savefig(plot_save, bbox_inches='tight')
+# print(os.makedirs(plot_path, exist_ok=True))
+plt.savefig("fig.pdf", bbox_inches='tight')
 plt.show()
 
 
