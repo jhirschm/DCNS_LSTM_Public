@@ -3,7 +3,7 @@ import h5py
 import os
 data_dir = "/fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_Data"
 file_idx = 1
-sample_idx = 1
+sample_idx = 2
 with h5py.File(os.path.join(data_dir, "X_new_data.h5"), "r") as file:
     x_dataset = file[f"dataset_{file_idx}"]
 
