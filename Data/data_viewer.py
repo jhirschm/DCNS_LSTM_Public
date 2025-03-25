@@ -9,17 +9,11 @@ plot_name = "data_proc_fig1.pdf"
 plot_save = os.path.join(plot_path, plot_name)
 def get_data_labels(file_idx, sample_idx):
     with h5py.File(os.path.join(data_dir, "X_new_data.h5"), "r") as file:
-        x_dataset = file[f"dataset_{file_idx}"]
-
-        
-
-        data = x_dataset[sample_idx]
+        data = np.array(file[f"dataset_{file_idx}"][sample_idx])
 
     with h5py.File(os.path.join(data_dir, "y_new_data.h5"), "r") as file:
-        y_dataset = file[f"dataset_{file_idx}"]
-        # If training or funky analysis, we want to load the entire dataset
-        
-        labels = y_dataset[sample_idx]
+        labels = np.array(file[f"dataset_{file_idx}"][sample_idx])
+
     return data, labels
 
 # Fetch required datasets
