@@ -20,18 +20,17 @@ def get_data_labels(file_idx, sample_idx):
 samples = [0, 1, 2, 99]
 all_data_labels = [get_data_labels(0, idx) for idx in samples]
 
-# Create plot
 fig, axes = plt.subplots(nrows=4, ncols=11, figsize=(22, 8))
 
 for row_idx, (data, labels) in enumerate(all_data_labels):
-    # Plot first 10 data series
     for col_idx in range(10):
-        axes[row_idx, col_idx].plot(data[col_idx])
-        axes[row_idx, col_idx].axis('off')  # remove axis labels, ticks, etc.
+        axes[row_idx, col_idx].plot(np.squeeze(data[col_idx]), color='black')
+        axes[row_idx, col_idx].set_xticks([])
+        axes[row_idx, col_idx].set_yticks([])
 
-    # Plot labels in 11th subplot
-    axes[row_idx, 10].plot(labels)
-    axes[row_idx, 10].axis('off')
+    axes[row_idx, 10].plot(np.squeeze(labels), color='black')
+    axes[row_idx, 10].set_xticks([])
+    axes[row_idx, 10].set_yticks([])
 
 plt.tight_layout()
 # print(os.makedirs(plot_path, exist_ok=True))
