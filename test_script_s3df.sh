@@ -20,7 +20,7 @@ export PYTHONIOENCODING=utf-8
 
 #python3 main.py --model LSTM --data_dir /fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_Data --output_dir "/sdf/scratch/lcls/ds/prj/prjs2e21/scratch/dcns_lstm_output/test_06032024" --custom_code 1 --batch_size 200 --load_in_gpu 0
 
-python3 main.py --model LSTM --data_dir /fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_Data --do_analysis 1 --model_param_path /fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_Data/LSTM_120_epoch_44.pth --analysis_file 91 --analysis_example 15 --output_dir /sdf/data/lcls/ds/prj/prjs2e21/results/DCNS_LSTM_Output/ --fig_save_dir /sdf/data/lcls/ds/prj/prjs2e21/results/DCNS_LSTM_Output/
-		
+python3 main.py --model LSTM --data_dir /fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_Data --do_analysis 1 --model_param_path /fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_Data/LSTM_120_epoch_44.pth --analysis_file 98 --analysis_example 25 --output_dir /sdf/data/lcls/ds/prj/prjs2e21/results/DCNS_LSTM_Output/ --fig_save_dir /sdf/data/lcls/ds/prj/prjs2e21/results/DCNS_LSTM_Output/
+#93 56, 98 25		
 #python3 main.py --model LSTM --data_dir /fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_Data --do_prediction 1 --model_param_path /fs/ddn/sdf/group/lcls/ds/scratch/s2e_scratch/Data/DCNS_NLO_LSTM_H5_Data/LSTM_120_epoch_44.pth --output_dir /sdf/data/lcls/ds/prj/prjs2e21/results/DCNS_LSTM_Output/
 echo Finished at: `date`
